@@ -1,40 +1,10 @@
-<!-- SEU CÓDIGO CONTINUA EXATAMENTE IGUAL ATÉ AQUI -->
+<!-- (TUDO IGUAL ATÉ O FINAL DO </main>) -->
 
   </main>
 
-  <!-- ===== LEGENDA DE PRIORIDADES ===== -->
-  <aside
-    class="legenda-prioridades"
-    aria-label="Legenda de prioridades"
-  >
-    <p class="legenda-prioridades__titulo">Prioridade:</p>
-    <ul class="legenda-prioridades__items" role="list">
-      <li>
-        <span class="legenda-item">
-          <span class="legenda-item__cor legenda-item__cor--alta"></span>
-          Alta
-        </span>
-      </li>
-      <li>
-        <span class="legenda-item">
-          <span class="legenda-item__cor legenda-item__cor--media"></span>
-          Média
-        </span>
-      </li>
-      <li>
-        <span class="legenda-item">
-          <span class="legenda-item__cor legenda-item__cor--baixa"></span>
-          Baixa
-        </span>
-      </li>
-    </ul>
-  </aside>
-
-  </main>
-
-  <!-- =======================
-       SCRIPT FUNCIONAL (NOVO)
-  ======================== -->
+  <!-- =========================
+       SCRIPT (FUNCIONAL)
+  ========================== -->
   <script>
     const form = document.querySelector(".form-nova-tarefa");
     const input = document.getElementById("input-nova-tarefa");
@@ -49,7 +19,7 @@
       info.innerHTML = `<strong>${pendentes}</strong>&nbsp;tarefas pendentes de ${total}`;
     }
 
-    // eventos nos checkboxes existentes
+    // CHECKBOXES EXISTENTES
     document.querySelectorAll(".task-check").forEach(cb => {
       cb.addEventListener("change", () => {
         if (cb.checked) pendentes--;
@@ -58,7 +28,7 @@
       });
     });
 
-    // adicionar nova tarefa
+    // ADICIONAR TAREFA
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
@@ -75,7 +45,11 @@
       const li = document.createElement("li");
 
       li.innerHTML = `
-        <input type="checkbox" id="${id}" class="task-check">
+        <input
+          type="checkbox"
+          id="${id}"
+          class="task-check"
+        >
         <label for="${id}" class="task-item prioridade-${prioridade}">
           <span class="task-item__check"></span>
           <span class="task-item__conteudo">
@@ -97,8 +71,8 @@
         atualizarContador();
       });
 
-      atualizarContador();
       input.value = "";
+      atualizarContador();
     });
 
     atualizarContador();
