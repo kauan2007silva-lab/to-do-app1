@@ -1,81 +1,505 @@
-<!-- (TUDO IGUAL ATÉ O FINAL DO </main>) -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List · Projeto Acadêmico</title>
 
-  </main>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
 
-  <!-- =========================
-       SCRIPT (FUNCIONAL)
-  ========================== -->
-  <script>
-    const form = document.querySelector(".form-nova-tarefa");
-    const input = document.getElementById("input-nova-tarefa");
-    const select = document.getElementById("select-prioridade");
-    const lista = document.getElementById("lista-tarefas");
-    const info = document.querySelector(".lista-rodape__info");
+  <style>
+    /* =====================================================
+       TODO LIST — CSS COMPLETO
+       ===================================================== */
 
-    let total = document.querySelectorAll(".task-item").length;
-    let pendentes = document.querySelectorAll(".task-check:not(:checked)").length;
+    :root {
+      /* Alta: vermelho/coral */
+      --alta-base: #e63946;
+      --alta-bg:   #fff0f1;
+      --alta-text: #9b1c26;
 
-    function atualizarContador() {
-      info.innerHTML = `<strong>${pendentes}</strong>&nbsp;tarefas pendentes de ${total}`;
+      /* Média: âmbar */
+      --media-base: #f4a261;
+      --media-bg:   #fff8f0;
+      --media-text: #8f4e0a;
+
+      /* Baixa: verde-azulado */
+      --baixa-base: #2a9d8f;
+      --baixa-bg:   #f0faf9;
+      --baixa-text: #1a6b60;
+
+      /* Cores neutras e de layout */
+      --cor-fundo:      #f2f0eb;
+      --cor-superficie: #fafaf8;
+      --cor-borda:      #e0ddd6;
+      --cor-borda-hover:#c8c4bc;
+
+      --cor-texto:      #1a1a1a;
+      --cor-texto-2:    #5a5651;
+      --cor-texto-3:    #9c9790;
+      --cor-concluido:  #a09a92;
+
+      --cor-primaria:   #264653;
+      --cor-primaria-hover: #1a3340;
+      --cor-foco: #2a9d8f;
+
+      --space-xs:  4px;
+      --space-sm:  8px;
+      --space-md:  16px;
+      --space-lg:  24px;
+      --space-xl:  40px;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+
+      --fonte: 'Lato', Georgia, 'Times New Roman', serif;
+      --transicao: 0.18s ease;
     }
 
-    // CHECKBOXES EXISTENTES
-    document.querySelectorAll(".task-check").forEach(cb => {
-      cb.addEventListener("change", () => {
-        if (cb.checked) pendentes--;
-        else pendentes++;
-        atualizarContador();
-      });
-    });
+    /* Reset e Layout Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    // ADICIONAR TAREFA
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+    ul, ol { list-style: none; }
 
-      const texto = input.value.trim();
-      const prioridade = select.value;
+    input, button, select {
+      font-family: inherit;
+      font-size: inherit;
+    }
 
-      if (!texto) return;
+    body {
+      font-family: var(--fonte);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--cor-texto);
+      background-color: var(--cor-fundo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-lg) var(--space-md);
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 27px,
+        var(--cor-borda) 27px,
+        var(--cor-borda) 28px
+      );
+    }
 
-      total++;
-      pendentes++;
+    .card-principal {
+      background: var(--cor-superficie);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--cor-borda);
+      width: 100%;
+      max-width: 600px;
+      padding: var(--space-xl) var(--space-lg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.06);
+      border-left: 4px solid var(--cor-primaria);
+    }
 
-      const id = "task-" + total;
+    @media (min-width: 480px) {
+      .card-principal { padding: var(--space-xl) var(--space-xl); }
+    }
 
-      const li = document.createElement("li");
+    .cabecalho {
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-lg);
+      border-bottom: 2px dashed var(--cor-borda);
+    }
 
-      li.innerHTML = `
+    .cabecalho h1 {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--cor-primaria);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .cabecalho p {
+      margin-top: var(--space-xs);
+      font-size: 0.78rem;
+      color: var(--cor-texto-3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Área do Formulário */
+    .formulario {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .formulario__input {
+      flex: 1;
+      min-width: 140px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-sm);
+      background: white;
+      color: var(--cor-texto);
+      transition: border-color var(--transicao);
+    }
+
+    .formulario__input::placeholder { color: var(--cor-texto-3); }
+    .formulario__input:focus { outline: 2px solid var(--cor-foco); outline-offset: 1px; border-color: var(--cor-foco); }
+
+    .formulario__select {
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-sm);
+      background: white;
+      color: var(--cor-texto);
+      cursor: pointer;
+      transition: border-color var(--transicao);
+    }
+
+    .formulario__select:focus { outline: 2px solid var(--cor-foco); outline-offset: 1px; border-color: var(--cor-foco); }
+
+    .formulario__botao {
+      padding: var(--space-sm) var(--space-md);
+      background: var(--cor-primaria);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background var(--transicao), transform var(--transicao);
+    }
+
+    .formulario__botao:hover { background: var(--cor-primaria-hover); }
+    .formulario__botao:active { transform: scale(0.95); }
+
+    /* Seções e Listas */
+    .secao-categoria { margin-bottom: var(--space-xl); }
+    .secao-categoria:last-of-type { margin-bottom: 0; }
+
+    .secao-categoria__titulo {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cor-texto-3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .secao-categoria__titulo::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--cor-borda);
+    }
+
+    .lista-tarefas {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    /* Checkbox Hack */
+    .item-tarefa input[type="checkbox"] { display: none; }
+
+    .item-tarefa label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--cor-texto);
+      transition: background var(--transicao), border-color var(--transicao), color var(--transicao);
+      position: relative;
+    }
+
+    .item-tarefa label:hover {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: var(--cor-borda);
+    }
+
+    .item-tarefa label::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--cor-borda-hover);
+      background: white;
+      transition: background var(--transicao), border-color var(--transicao), transform 0.15s ease;
+    }
+
+    .item-tarefa input:checked + label {
+      color: var(--cor-concluido);
+      text-decoration: line-through;
+      text-decoration-color: var(--cor-concluido);
+      text-decoration-thickness: 1.5px;
+      opacity: 0.65;
+    }
+
+    .item-tarefa input:checked + label::before {
+      background: var(--cor-primaria);
+      border-color: var(--cor-primaria);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpolyline points='1.5%2C5 4.5%2C8 10.5%2C1.5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C%2Fsvg%3E");
+      background-size: 12px 10px;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform: scale(1.15);
+    }
+
+    .item-tarefa input:checked + label:hover::before { transform: scale(1.05); }
+    .item-tarefa__texto { flex: 1; line-height: 1.4; }
+    .item-tarefa label:focus-visible { outline: 2px solid var(--cor-foco); outline-offset: 2px; }
+
+    /* Prioridades e Badges */
+    .prioridade-alta label { border-left: 3px solid var(--alta-base) !important; background: var(--alta-bg); }
+    .prioridade-alta label:hover { background: #ffe0e2; border-color: var(--cor-borda) !important; border-left-color: var(--alta-base) !important; }
+    .prioridade-alta input:checked + label { border-left-color: var(--cor-borda) !important; background: transparent; }
+
+    .prioridade-media label { border-left: 3px solid var(--media-base) !important; background: var(--media-bg); }
+    .prioridade-media label:hover { background: #fdecd0; border-color: var(--cor-borda) !important; border-left-color: var(--media-base) !important; }
+    .prioridade-media input:checked + label { border-left-color: var(--cor-borda) !important; background: transparent; }
+
+    .prioridade-baixa label { border-left: 3px solid var(--baixa-base) !important; background: var(--baixa-bg); }
+    .prioridade-baixa label:hover { background: #d8f2ef; border-color: var(--cor-borda) !important; border-left-color: var(--baixa-base) !important; }
+    .prioridade-baixa input:checked + label { border-left-color: var(--cor-borda) !important; background: transparent; }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px var(--space-sm);
+      border-radius: 20px;
+      white-space: nowrap;
+      margin-left: auto;
+      transition: opacity var(--transicao);
+    }
+
+    .prioridade-alta .badge { background: var(--alta-bg); color: var(--alta-text); border: 1px solid var(--alta-base); }
+    .prioridade-media .badge { background: var(--media-bg); color: var(--media-text); border: 1px solid var(--media-base); }
+    .prioridade-baixa .badge { background: var(--baixa-bg); color: var(--baixa-text); border: 1px solid var(--baixa-base); }
+    .item-tarefa input:checked + label .badge { display: none; }
+
+    .rodape {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-lg);
+      border-top: 2px dashed var(--cor-borda);
+      font-size: 0.72rem;
+      color: var(--cor-texto-3);
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    @media (max-width: 360px) {
+      .formulario { flex-direction: column; }
+      .formulario__botao { width: 100%; }
+      .item-tarefa label { font-size: 0.88rem; padding: var(--space-sm) var(--space-md); gap: var(--space-sm); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="card-principal" role="main">
+
+    <header class="cabecalho">
+      <h1>📋 Minhas Tarefas</h1>
+      <p>Projeto Acadêmico · Engenharia de Prompt · v1.1</p>
+    </header>
+
+    <section class="area-formulario" aria-label="Adicionar nova tarefa">
+      <div class="formulario" role="group">
+        
         <input
-          type="checkbox"
-          id="${id}"
-          class="task-check"
-        >
-        <label for="${id}" class="task-item prioridade-${prioridade}">
-          <span class="task-item__check"></span>
-          <span class="task-item__conteudo">
-            <span class="task-item__texto">${texto}</span>
-            <span class="task-item__badge">
-              ${prioridade.charAt(0).toUpperCase() + prioridade.slice(1)}
-            </span>
-          </span>
-        </label>
-      `;
+          id="input-tarefa"
+          class="formulario__input"
+          type="text"
+          placeholder="Nova tarefa..."
+          aria-label="Texto da nova tarefa"
+        />
 
-      lista.appendChild(li);
+        <select id="select-categoria" class="formulario__select" aria-label="Categoria da nova tarefa">
+          <option value="faculdade">🎓 Faculdade</option>
+          <option value="pessoal">🌱 Pessoal</option>
+          <option value="projetos">💻 Projetos</option>
+        </select>
 
-      const checkbox = li.querySelector(".task-check");
+        <select id="select-prioridade" class="formulario__select" aria-label="Prioridade da nova tarefa">
+          <option value="alta">🔴 Alta</option>
+          <option value="media" selected>🟡 Média</option>
+          <option value="baixa">🟢 Baixa</option>
+        </select>
 
-      checkbox.addEventListener("change", () => {
-        if (checkbox.checked) pendentes--;
-        else pendentes++;
-        atualizarContador();
+        <button id="btn-adicionar" class="formulario__botao" aria-label="Adicionar nova tarefa">
+          +
+        </button>
+
+      </div>
+    </section>
+
+    <section class="secao-categoria" aria-labelledby="titulo-faculdade">
+      <h2 class="secao-categoria__titulo" id="titulo-faculdade">🎓 Faculdade</h2>
+      <ul id="lista-faculdade" class="lista-tarefas" role="list">
+        <li class="item-tarefa prioridade-alta" role="listitem">
+          <input type="checkbox" id="t1" aria-describedby="prioridade-t1" />
+          <label for="t1">
+            <span class="item-tarefa__texto">Entregar relatório de Eng. de Prompt</span>
+            <span class="badge" id="prioridade-t1" aria-label="Prioridade: Alta">Alta</span>
+          </label>
+        </li>
+        <li class="item-tarefa prioridade-media" role="listitem">
+          <input type="checkbox" id="t2" aria-describedby="prioridade-t2" />
+          <label for="t2">
+            <span class="item-tarefa__texto">Estudar seletores CSS avançados (:has, ~)</span>
+            <span class="badge" id="prioridade-t2" aria-label="Prioridade: Média">Média</span>
+          </label>
+        </li>
+        <li class="item-tarefa prioridade-baixa" role="listitem">
+          <input type="checkbox" id="t3" checked aria-describedby="prioridade-t3" />
+          <label for="t3">
+            <span class="item-tarefa__texto">Criar estrutura base do HTML semântico</span>
+            <span class="badge" id="prioridade-t3" aria-label="Prioridade: Baixa">Baixa</span>
+          </label>
+        </li>
+      </ul>
+    </section>
+
+    <section class="secao-categoria" aria-labelledby="titulo-pessoal">
+      <h2 class="secao-categoria__titulo" id="titulo-pessoal">🌱 Pessoal</h2>
+      <ul id="lista-pessoal" class="lista-tarefas" role="list">
+        <li class="item-tarefa prioridade-media" role="listitem">
+          <input type="checkbox" id="t5" checked aria-describedby="prioridade-t5" />
+          <label for="t5">
+            <span class="item-tarefa__texto">Tomar café da manhã</span>
+            <span class="badge" id="prioridade-t5" aria-label="Prioridade: Média">Média</span>
+          </label>
+        </li>
+        <li class="item-tarefa prioridade-baixa" role="listitem">
+          <input type="checkbox" id="t6" aria-describedby="prioridade-t6" />
+          <label for="t6">
+            <span class="item-tarefa__texto">Ler 30 minutos de livro técnico</span>
+            <span class="badge" id="prioridade-t6" aria-label="Prioridade: Baixa">Baixa</span>
+          </label>
+        </li>
+        <li class="item-tarefa prioridade-alta" role="listitem">
+          <input type="checkbox" id="t7" aria-describedby="prioridade-t7" />
+          <label for="t7">
+            <span class="item-tarefa__texto">Caminhar 20 minutos ao ar livre</span>
+            <span class="badge" id="prioridade-t7" aria-label="Prioridade: Alta">Alta</span>
+          </label>
+        </li>
+      </ul>
+    </section>
+
+    <section class="secao-categoria" aria-labelledby="titulo-projetos">
+      <h2 class="secao-categoria__titulo" id="titulo-projetos">💻 Projetos</h2>
+      <ul id="lista-projetos" class="lista-tarefas" role="list">
+        <li class="item-tarefa prioridade-media" role="listitem">
+          <input type="checkbox" id="t8" aria-describedby="prioridade-t8" />
+          <label for="t8">
+            <span class="item-tarefa__texto">Publicar projeto no GitHub Pages</span>
+            <span class="badge" id="prioridade-t8" aria-label="Prioridade: Média">Média</span>
+          </label>
+        </li>
+        <li class="item-tarefa prioridade-baixa" role="listitem">
+          <input type="checkbox" id="t9" aria-describedby="prioridade-t9" />
+          <label for="t9">
+            <span class="item-tarefa__texto">Documentar o Checkbox Hack no README</span>
+            <span class="badge" id="prioridade-t9" aria-label="Prioridade: Baixa">Baixa</span>
+          </label>
+        </li>
+      </ul>
+    </section>
+
+    <footer class="rodape">
+      <p>HTML5 + CSS3 + JavaScript · WCAG AA</p>
+    </footer>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputTarefa = document.getElementById('input-tarefa');
+      const selectCategoria = document.getElementById('select-categoria');
+      const selectPrioridade = document.getElementById('select-prioridade');
+      const btnAdicionar = document.getElementById('btn-adicionar');
+
+      // Variável para gerar IDs únicos para os novos inputs (começa no 10, já que o HTML vai até t9)
+      let contadorTarefas = 10;
+
+      // Função principal de adicionar tarefa
+      function adicionarNovaTarefa() {
+        const textoTarefa = inputTarefa.value.trim();
+        
+        // Impede de adicionar tarefa vazia
+        if (textoTarefa === '') {
+          inputTarefa.focus();
+          return; 
+        }
+
+        const categoriaSelecionada = selectCategoria.value;
+        const prioridadeSelecionada = selectPrioridade.value;
+        
+        // Define o texto do badge com base na prioridade
+        let textoBadge = 'Média';
+        if (prioridadeSelecionada === 'alta') textoBadge = 'Alta';
+        if (prioridadeSelecionada === 'baixa') textoBadge = 'Baixa';
+
+        // Pega a lista (ul) correta baseada na categoria
+        const listaAlvo = document.getElementById(`lista-${categoriaSelecionada}`);
+        
+        // Criação dinâmica dos elementos HTML
+        const novoItem = document.createElement('li');
+        novoItem.className = `item-tarefa prioridade-${prioridadeSelecionada}`;
+        novoItem.setAttribute('role', 'listitem');
+
+        const idUnico = `t${contadorTarefas}`;
+        contadorTarefas++;
+
+        // Injeta a mesma estrutura do CSS Checkbox Hack
+        novoItem.innerHTML = `
+          <input type="checkbox" id="${idUnico}" aria-describedby="prioridade-${idUnico}" />
+          <label for="${idUnico}">
+            <span class="item-tarefa__texto">${textoTarefa}</span>
+            <span class="badge" id="prioridade-${idUnico}" aria-label="Prioridade: ${textoBadge}">${textoBadge}</span>
+          </label>
+        `;
+
+        // Adiciona a tarefa ao final da lista escolhida
+        listaAlvo.appendChild(novoItem);
+
+        // Limpa o input e devolve o foco
+        inputTarefa.value = '';
+        inputTarefa.focus();
+      }
+
+      // Adiciona o evento de clique no botão
+      btnAdicionar.addEventListener('click', adicionarNovaTarefa);
+
+      // Permite adicionar a tarefa apertando "Enter" no teclado
+      inputTarefa.addEventListener('keypress', (evento) => {
+        if (evento.key === 'Enter') {
+          adicionarNovaTarefa();
+        }
       });
-
-      input.value = "";
-      atualizarContador();
     });
-
-    atualizarContador();
   </script>
 
 </body>
