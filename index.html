@@ -1,66 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>To-Do List · Projeto Acadêmico</title>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List — Projeto Acadêmico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <style>
-    /* =====================================================
-       TODO LIST — CSS COMPLETO
-       ===================================================== */
 
-    :root {
-      /* Alta: vermelho/coral */
-      --alta-base: #e63946;
-      --alta-bg:   #fff0f1;
-      --alta-text: #9b1c26;
-
-      /* Média: âmbar */
-      --media-base: #f4a261;
-      --media-bg:   #fff8f0;
-      --media-text: #8f4e0a;
-
-      /* Baixa: verde-azulado */
-      --baixa-base: #2a9d8f;
-      --baixa-bg:   #f0faf9;
-      --baixa-text: #1a6b60;
-
-      /* Cores neutras e de layout */
-      --cor-fundo:      #f2f0eb;
-      --cor-superficie: #fafaf8;
-      --cor-borda:      #e0ddd6;
-      --cor-borda-hover:#c8c4bc;
-
-      --cor-texto:      #1a1a1a;
-      --cor-texto-2:    #5a5651;
-      --cor-texto-3:    #9c9790;
-      --cor-concluido:  #a09a92;
-
-      --cor-primaria:   #264653;
-      --cor-primaria-hover: #1a3340;
-      --cor-foco: #2a9d8f;
-
-      --space-xs:  4px;
-      --space-sm:  8px;
-      --space-md:  16px;
-      --space-lg:  24px;
-      --space-xl:  40px;
-
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
-
-      --fonte: 'Lato', Georgia, 'Times New Roman', serif;
-      --transicao: 0.18s ease;
-    }
-
-    /* Reset e Layout Base */
+    /* ============================================================
+       SEÇÃO 1 — RESET UNIVERSAL
+       box-sizing: border-box: padding e border ficam DENTRO
+       da largura declarada — elimina a causa nº1 de bugs de layout.
+    ============================================================ */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -69,437 +22,1028 @@
 
     ul, ol { list-style: none; }
 
-    input, button, select {
-      font-family: inherit;
-      font-size: inherit;
+    /* ============================================================
+       SEÇÃO 2 — VARIÁVEIS GLOBAIS (:root)
+       Por quê :root? Especificidade maior que body e é o local
+       semântico correto para variáveis de documento inteiro.
+       Mudar um valor aqui propaga para todos os componentes.
+    ============================================================ */
+    :root {
+      /* Tipografia */
+      --fonte-display : 'Syne', sans-serif;
+      --fonte-corpo   : 'DM Sans', sans-serif;
+
+      /* Paleta base — bege quente reduz fadiga visual vs branco puro */
+      --cor-fundo      : #F4EFE6;
+      --cor-superficie : #FDFAF5;
+      --cor-primaria   : #18182A;
+      --cor-texto      : #383848;
+      --cor-muted      : #888898;
+      --cor-borda      : #DDD8CE;
+
+      /* Acento coral: ações, foco, checkmarks */
+      --cor-acento      : #D9725A;
+      --cor-acento-hover: #BF5C45;
+      --cor-acento-fundo: rgba(217, 114, 90, 0.09);
+
+      /* Tarefa concluída */
+      --cor-concluida-texto: #AEAAB8;
+      --cor-concluida-linha: #C8C4D0;
+
+      /* Prioridades — cada nível tem fundo, borda e texto separados.
+         Fundo suave: não compete com o conteúdo do card.
+         Borda e badge: comunicam a urgência sem poluir. */
+      --prioridade-alta-fundo : #FEF0EE;
+      --prioridade-alta-borda : #E07060;
+      --prioridade-alta-texto : #9C2B1E;
+      --prioridade-alta-badge : #FCDBD6;
+
+      --prioridade-media-fundo : #FEF6EA;
+      --prioridade-media-borda : #D99A38;
+      --prioridade-media-texto : #7A4E10;
+      --prioridade-media-badge : #FDECC8;
+
+      --prioridade-baixa-fundo : #EEF7EE;
+      --prioridade-baixa-borda : #52A060;
+      --prioridade-baixa-texto : #1E5E2A;
+      --prioridade-baixa-badge : #CDEBD0;
+
+      /* Espaçamento em escala de 8px — padrão da indústria (Material,
+         Tailwind). O olho humano percebe harmonia em múltiplos de uma
+         unidade base. */
+      --spacing-xs : 4px;
+      --spacing-sm : 8px;
+      --spacing-md : 16px;
+      --spacing-lg : 24px;
+      --spacing-xl : 32px;
+      --spacing-2xl: 48px;
+
+      /* Border-radius com nomes semânticos (o nome descreve o USO,
+         não o valor — se mudar a estética, muda só aqui) */
+      --raio-sm  : 6px;
+      --raio-md  : 10px;
+      --raio-lg  : 16px;
+      --raio-xl  : 24px;
+      --raio-pill: 999px;
+
+      /* Sombras para elevação de cartão */
+      --sombra-cartao: 0 1px 0 0 var(--cor-borda),
+                       0 4px 16px -2px rgba(24,24,42,0.06);
+
+      /* 200ms: limiar de "instantâneo" para o cérebro humano.
+         ease-out: começa rápido, desacelera — sensação de física real */
+      --transition-fast: 150ms ease-out;
+      --transition-base: 200ms ease-out;
+    }
+
+    /* ============================================================
+       SEÇÃO 3 — BASE TIPOGRÁFICA
+    ============================================================ */
+    html {
+      /* 100% respeita a preferência de zoom do usuário — acessível */
+      font-size: 100%;
+      -webkit-font-smoothing : antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
-      font-family: var(--fonte);
-      font-size: 16px;
-      line-height: 1.5;
-      color: var(--cor-texto);
-      background-color: var(--cor-fundo);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: var(--space-lg) var(--space-md);
-      background-image: repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 27px,
-        var(--cor-borda) 27px,
-        var(--cor-borda) 28px
-      );
+      font-family : var(--fonte-corpo);
+      font-size   : 1rem;
+      line-height : 1.6;
+      color       : var(--cor-texto);
+      background  : var(--cor-fundo);
+      min-height  : 100vh;
+      padding     : var(--spacing-2xl) var(--spacing-md);
+      /* Textura decorativa com gradiente CSS — sem JS, sem imagem */
+      background-image:
+        radial-gradient(
+          ellipse 60% 40% at 10% 0%,
+          rgba(217,114,90,0.07) 0%, transparent 100%
+        ),
+        radial-gradient(
+          ellipse 50% 50% at 90% 100%,
+          rgba(24,24,42,0.04) 0%, transparent 100%
+        );
     }
 
-    .card-principal {
-      background: var(--cor-superficie);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--cor-borda);
-      width: 100%;
+    /* ============================================================
+       SEÇÃO 4 — CONTAINER
+       max-width + margin: 0 auto = centralização clássica.
+       Sem min-width: adapta a telas menores que 600px (mobile-first).
+    ============================================================ */
+    .container {
       max-width: 600px;
-      padding: var(--space-xl) var(--space-lg);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.06);
-      border-left: 4px solid var(--cor-primaria);
+      margin   : 0 auto;
     }
 
-    @media (min-width: 480px) {
-      .card-principal { padding: var(--space-xl) var(--space-xl); }
+    /* ============================================================
+       SEÇÃO 5 — CABEÇALHO
+    ============================================================ */
+    .app-cabecalho {
+      margin-bottom: var(--spacing-xl);
     }
 
-    .cabecalho {
-      margin-bottom: var(--space-xl);
-      padding-bottom: var(--space-lg);
-      border-bottom: 2px dashed var(--cor-borda);
-    }
-
-    .cabecalho h1 {
-      font-size: clamp(1.6rem, 5vw, 2.2rem);
-      font-weight: 700;
-      color: var(--cor-primaria);
-      letter-spacing: -0.5px;
-      line-height: 1.2;
-    }
-
-    .cabecalho p {
-      margin-top: var(--space-xs);
-      font-size: 0.78rem;
-      color: var(--cor-texto-3);
+    /* "eyebrow": texto pequeno acima do título — contextualiza
+       antes do impacto. ::before cria o ponto decorativo sem HTML extra */
+    .app-cabecalho__eyebrow {
+      display       : inline-flex;
+      align-items   : center;
+      gap           : var(--spacing-sm);
+      font-size     : 0.6875rem;
+      font-weight   : 500;
+      letter-spacing: 0.10em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      color         : var(--cor-acento);
+      margin-bottom : var(--spacing-md);
     }
 
-    /* Área do Formulário */
-    .formulario {
-      display: flex;
-      gap: var(--space-sm);
-      margin-bottom: var(--space-xl);
+    .app-cabecalho__eyebrow::before {
+      content      : '';
+      display      : block;
+      width        : 6px;
+      height       : 6px;
+      border-radius: var(--raio-pill);
+      background   : var(--cor-acento);
+      flex-shrink  : 0;
+    }
+
+    .app-cabecalho__titulo {
+      font-family   : var(--fonte-display);
+      /* clamp(min, fluido, max): responsividade sem @media query */
+      font-size     : clamp(1.75rem, 7vw, 2.5rem);
+      font-weight   : 700;
+      color         : var(--cor-primaria);
+      line-height   : 1.1;
+      margin-bottom : var(--spacing-sm);
+      /* letter-spacing negativo compensa espaçamento excessivo em
+         tamanhos grandes */
+      letter-spacing: -0.02em;
+    }
+
+    .app-cabecalho__subtitulo {
+      font-size: 0.9375rem;
+      color    : var(--cor-muted);
+    }
+
+    /* ============================================================
+       SEÇÃO 6 — FORMULÁRIO DE NOVA TAREFA
+       Academicamente correto mas sem inserção real (sem JS).
+       Demonstra: semântica, estados focus, labels acessíveis.
+    ============================================================ */
+    .form-nova-tarefa {
+      display      : flex;
+      gap          : var(--spacing-sm);
+      margin-bottom: var(--spacing-lg);
+      /* flex-wrap: select "sobe" para nova linha antes de ficar
+         pequeno demais para ser utilizável */
+      flex-wrap    : wrap;
+    }
+
+    /* flex: 1 + min-width: garante que o input ocupe o espaço
+       máximo mas não quebre abaixo de 150px */
+    .form-nova-tarefa__input {
+      flex         : 1;
+      min-width    : 150px;
+      height       : 44px;
+      padding      : 0 var(--spacing-md);
+      font-family  : var(--fonte-corpo);
+      font-size    : 0.9375rem;
+      color        : var(--cor-texto);
+      background   : var(--cor-superficie);
+      border       : 1.5px solid var(--cor-borda);
+      border-radius: var(--raio-md);
+      outline      : none;
+      transition   : border-color var(--transition-base),
+                     box-shadow var(--transition-base);
+    }
+
+    .form-nova-tarefa__input::placeholder {
+      color: var(--cor-muted);
+    }
+
+    /* :focus-visible: foco apenas na navegação por teclado —
+       não aparece ao clicar com mouse (melhora UX sem sacrificar A11y) */
+    .form-nova-tarefa__input:focus-visible {
+      border-color: var(--cor-acento);
+      box-shadow  : 0 0 0 3px var(--cor-acento-fundo);
+    }
+
+    .form-nova-tarefa__select {
+      height       : 44px;
+      padding      : 0 var(--spacing-md);
+      font-family  : var(--fonte-corpo);
+      font-size    : 0.875rem;
+      color        : var(--cor-texto);
+      background   : var(--cor-superficie);
+      border       : 1.5px solid var(--cor-borda);
+      border-radius: var(--raio-md);
+      outline      : none;
+      cursor       : pointer;
+      transition   : border-color var(--transition-base);
+    }
+
+    .form-nova-tarefa__select:focus-visible {
+      border-color: var(--cor-acento);
+      box-shadow  : 0 0 0 3px var(--cor-acento-fundo);
+    }
+
+    .form-nova-tarefa__botao {
+      display        : inline-flex;
+      align-items    : center;
+      justify-content: center;
+      height         : 44px;
+      padding        : 0 var(--spacing-lg);
+      font-family    : var(--fonte-corpo);
+      font-size      : 0.9375rem;
+      font-weight    : 500;
+      color          : #fff;
+      background     : var(--cor-acento);
+      border         : none;
+      border-radius  : var(--raio-md);
+      cursor         : pointer;
+      white-space    : nowrap;
+      user-select    : none;
+      transition     : background var(--transition-base),
+                       transform var(--transition-fast);
+    }
+
+    .form-nova-tarefa__botao:hover {
+      background: var(--cor-acento-hover);
+    }
+
+    /* :active simula o "apertar" físico — feedback tátil visual */
+    .form-nova-tarefa__botao:active {
+      transform: scale(0.97);
+    }
+
+    .form-nova-tarefa__botao:focus-visible {
+      outline   : 2px solid var(--cor-acento);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px var(--cor-acento-fundo);
+    }
+
+    /* ============================================================
+       SEÇÃO 7 — CARTÃO PRINCIPAL
+       overflow: hidden é crítico: sem ele, as bordas coloridas de
+       prioridade dos itens "vazam" pelo border-radius do cartão.
+    ============================================================ */
+    .lista-cartao {
+      background   : var(--cor-superficie);
+      border-radius: var(--raio-xl);
+      overflow     : hidden;
+      box-shadow   : var(--sombra-cartao);
+    }
+
+    /* ============================================================
+       SEÇÃO 8 — SISTEMA DE FILTROS (radio button hack)
+       Os radio buttons ficam FORA e ANTES do cartão no DOM.
+       Isso é obrigatório para o seletor ~ (irmão geral) funcionar.
+
+       Radio vs Checkbox: radio buttons com mesmo "name" são
+       mutuamente exclusivos por padrão — comportamento nativo
+       de "apenas um ativo por vez", sem JS.
+    ============================================================ */
+    .filtro-radio {
+      position: absolute;
+      width   : 1px;
+      height  : 1px;
+      opacity : 0;
+    }
+
+    .lista-filtros {
+      display      : flex;
+      gap          : 2px;
+      padding      : var(--spacing-sm);
+      border-bottom: 1px solid var(--cor-borda);
+      background   : rgba(0, 0, 0, 0.018);
+    }
+
+    .filtro-label {
+      flex         : 1;
+      display      : block;
+      padding      : 7px 12px;
+      text-align   : center;
+      font-size    : 0.875rem;
+      font-weight  : 500;
+      color        : var(--cor-muted);
+      border-radius: var(--raio-sm);
+      cursor       : pointer;
+      user-select  : none;
+      transition   : background var(--transition-base),
+                     color var(--transition-base);
+    }
+
+    .filtro-label:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color     : var(--cor-texto);
+    }
+
+    /* Aba ativa — seletor lê:
+       "quando #filtro-X estiver :checked, dentro de qualquer irmão
+       .lista-cartao, estilize o label[for='filtro-X']" */
+    #filtro-todas:checked ~ .lista-cartao
+      .lista-filtros label[for="filtro-todas"],
+    #filtro-ativas:checked ~ .lista-cartao
+      .lista-filtros label[for="filtro-ativas"],
+    #filtro-concluidas:checked ~ .lista-cartao
+      .lista-filtros label[for="filtro-concluidas"] {
+      background: var(--cor-superficie);
+      color     : var(--cor-primaria);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.09);
+    }
+
+    /* ============================================================
+       SEÇÃO 9 — LÓGICA DE FILTRAGEM CSS
+       ~ alcança irmãos seguintes no DOM.
+       :checked detecta o estado do checkbox de cada tarefa.
+       :not(:checked) inverte — "tarefas que NÃO estão marcadas".
+    ============================================================ */
+
+    /* Padrão: todos visíveis */
+    .task-item { display: flex; }
+
+    /* Filtro Ativas: esconde concluídas */
+    #filtro-ativas:checked ~ .lista-cartao
+      .task-check:checked + .task-item {
+      display: none;
+    }
+
+    /* Filtro Concluídas: esconde pendentes */
+    #filtro-concluidas:checked ~ .lista-cartao
+      .task-check:not(:checked) + .task-item {
+      display: none;
+    }
+
+    /* ============================================================
+       SEÇÃO 10 — ITEM DE TAREFA
+       REGRA DOM OBRIGATÓRIA: .task-check vem ANTES de .task-item.
+       O seletor + só olha para o próximo irmão — nunca para trás.
+    ============================================================ */
+
+    /* Checkbox real — oculto mas acessível para leitores de tela.
+       NÃO usar display:none — isso remove da árvore de acessibilidade. */
+    .task-check {
+      position: absolute;
+      width   : 1px;
+      height  : 1px;
+      opacity : 0;
+    }
+
+    .task-item {
+      align-items : center;
+      gap         : var(--spacing-md);
+      padding     : var(--spacing-md) var(--spacing-lg);
+      cursor      : pointer;
+      border-bottom: 1px solid var(--cor-borda);
+      /* border-left com valor transparente: permite transição suave.
+         Sem isso, o browser não consegue animar de "sem borda"
+         para "borda colorida" — o valor precisa existir desde o início. */
+      border-left : 4px solid transparent;
+      transition  : background var(--transition-base),
+                    border-left-color var(--transition-base),
+                    opacity var(--transition-base);
+    }
+
+    .task-item:last-of-type {
+      border-bottom: none;
+    }
+
+    .task-item:hover {
+      background: rgba(0, 0, 0, 0.018);
+    }
+
+    /* Redireciona o anel de foco do input invisível para o label.
+       :focus-visible garante que apareça apenas na navegação por
+       teclado, não em cliques com mouse. */
+    .task-check:focus-visible + .task-item {
+      outline       : 2px solid var(--cor-acento);
+      outline-offset: -2px;
+    }
+
+    /* ============================================================
+       SEÇÃO 11 — CHECKBOX VISUAL CUSTOMIZADO
+       Construímos o checkmark com CSS puro usando o truque do
+       "L rotacionado 45°":
+       - Um retângulo com apenas border-right e border-bottom visíveis
+       - Rotacionado 45° forma o símbolo "✓"
+       Sem imagem, sem SVG inline, sem ícone externo.
+    ============================================================ */
+    .task-item__check {
+      flex-shrink    : 0;
+      width          : 22px;
+      height         : 22px;
+      border-radius  : var(--raio-pill);
+      border         : 2px solid var(--cor-borda);
+      background     : transparent;
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      transition     : background var(--transition-base),
+                       border-color var(--transition-base),
+                       transform var(--transition-fast);
+    }
+
+    .task-item__check::after {
+      content      : '';
+      display      : block;
+      width        : 5px;
+      height       : 9px;
+      border-right : 2px solid transparent;
+      border-bottom: 2px solid transparent;
+      /* rotate(45deg): L vira checkmark
+         translate: ajuste fino — sem isso o check parece
+         desalinhado verticalmente no círculo */
+      transform    : rotate(45deg) translate(-0.5px, -1px);
+      transition   : border-color var(--transition-base),
+                     opacity var(--transition-base);
+      opacity      : 0;
+    }
+
+    /* ============================================================
+       SEÇÃO 12 — O CHECKBOX HACK (núcleo interativo do projeto)
+
+       Quando .task-check recebe :checked, o CSS estiliza o
+       .task-item irmão seguinte (+) e todos os seus filhos.
+       Três transformações acontecem simultaneamente no mesmo clique.
+    ============================================================ */
+
+    /* 1. Círculo preenchido com cor acento */
+    .task-check:checked + .task-item .task-item__check {
+      background  : var(--cor-acento);
+      border-color: var(--cor-acento);
+      /* scale(0.9): micro-feedback "tátil" visual */
+      transform   : scale(0.9);
+    }
+
+    /* 2. Checkmark aparece */
+    .task-check:checked + .task-item .task-item__check::after {
+      border-color: #fff;
+      opacity     : 1;
+    }
+
+    /* 3. Texto riscado — text-decoration-color separa a cor do
+       risco da cor do texto para um visual mais refinado */
+    .task-check:checked + .task-item .task-item__texto {
+      text-decoration      : line-through;
+      text-decoration-color: var(--cor-concluida-linha);
+      color                : var(--cor-concluida-texto);
+    }
+
+    /* Card como um todo perde opacidade — sensação de "arquivado" */
+    .task-check:checked + .task-item {
+      opacity          : 0.72;
+      /* Borda de prioridade some ao concluir — tarefa resolvida não
+         precisa mais do sinal de urgência.
+         !important: as classes de prioridade têm especificidade
+         suficiente para ganhar sem ele, mas o tornamos explícito
+         e documentado para o próximo desenvolvedor. */
+      border-left-color: transparent !important;
+    }
+
+    /* Badge também desbota */
+    .task-check:checked + .task-item .task-item__badge {
+      opacity: 0.5;
+    }
+
+    /* ============================================================
+       SEÇÃO 13 — CONTEÚDO DO CARD (texto + badge)
+    ============================================================ */
+    .task-item__conteudo {
+      flex       : 1;
+      display    : flex;
+      align-items: center;
+      gap        : var(--spacing-sm);
+      /* min-width: 0 — correção para bug clássico de flexbox:
+         sem isso, texto longo força o card a crescer além do
+         container em vez de truncar com reticências. */
+      min-width  : 0;
+    }
+
+    .task-item__texto {
+      flex         : 1;
+      min-width    : 0;
+      font-size    : 0.9375rem;
+      color        : var(--cor-texto);
+      /* A tríade de truncagem: os três precisam estar juntos */
+      white-space  : nowrap;
+      overflow     : hidden;
+      text-overflow: ellipsis;
+      transition   : color var(--transition-base);
+    }
+
+    /* ============================================================
+       SEÇÃO 14 — BADGES DE PRIORIDADE
+       O badge base é genérico. As classes modificadoras aplicam cores.
+       Separar base de modificador facilita manutenção — para adicionar
+       uma nova prioridade, basta criar um novo modificador.
+    ============================================================ */
+    .task-item__badge {
+      flex-shrink  : 0;
+      font-size    : 0.6875rem;
+      font-weight  : 500;
+      letter-spacing: 0.03em;
+      padding      : 2px 8px;
+      border-radius: var(--raio-pill);
+      /* Valores neutros padrão — sobrescritos pelas classes abaixo */
+      background   : rgba(0,0,0,0.05);
+      color        : var(--cor-muted);
+      white-space  : nowrap;
+      transition   : opacity var(--transition-base);
+    }
+
+    /* ============================================================
+       SEÇÃO 15 — SISTEMA DE PRIORIDADES
+       Por que border-left e não background colorido no card?
+       O background colorido competiria com o conteúdo.
+       A borda lateral é o padrão de mercado para urgência
+       (Linear, Jira, Notion todos usam essa convenção).
+    ============================================================ */
+
+    /* Alta prioridade */
+    .task-item.prioridade-alta {
+      border-left-color: var(--prioridade-alta-borda);
+      background       : var(--prioridade-alta-fundo);
+    }
+
+    .task-item.prioridade-alta .task-item__badge {
+      background: var(--prioridade-alta-badge);
+      color     : var(--prioridade-alta-texto);
+    }
+
+    .task-item.prioridade-alta:hover {
+      filter: brightness(0.975);
+    }
+
+    /* Média prioridade */
+    .task-item.prioridade-media {
+      border-left-color: var(--prioridade-media-borda);
+      background       : var(--prioridade-media-fundo);
+    }
+
+    .task-item.prioridade-media .task-item__badge {
+      background: var(--prioridade-media-badge);
+      color     : var(--prioridade-media-texto);
+    }
+
+    .task-item.prioridade-media:hover {
+      filter: brightness(0.975);
+    }
+
+    /* Baixa prioridade */
+    .task-item.prioridade-baixa {
+      border-left-color: var(--prioridade-baixa-borda);
+      background       : var(--prioridade-baixa-fundo);
+    }
+
+    .task-item.prioridade-baixa .task-item__badge {
+      background: var(--prioridade-baixa-badge);
+      color     : var(--prioridade-baixa-texto);
+    }
+
+    .task-item.prioridade-baixa:hover {
+      filter: brightness(0.975);
+    }
+
+    /* ============================================================
+       SEÇÃO 16 — RODAPÉ DA LISTA
+    ============================================================ */
+    .lista-rodape {
+      display        : flex;
+      align-items    : center;
+      justify-content: space-between;
+      flex-wrap      : wrap;
+      gap            : var(--spacing-sm);
+      padding        : var(--spacing-md) var(--spacing-lg);
+      border-top     : 1px solid var(--cor-borda);
+      background     : rgba(0, 0, 0, 0.018);
+    }
+
+    .lista-rodape__info {
+      font-size: 0.8125rem;
+      color    : var(--cor-muted);
+    }
+
+    .lista-rodape__info strong {
+      color      : var(--cor-acento);
+      font-weight: 500;
+    }
+
+    .lista-rodape__dica {
+      font-size : 0.75rem;
+      color     : var(--cor-muted);
+      font-style: italic;
+    }
+
+    /* ============================================================
+       SEÇÃO 17 — LEGENDA
+    ============================================================ */
+    .legenda-prioridades {
+      display    : flex;
+      align-items: center;
+      gap        : var(--spacing-lg);
+      flex-wrap  : wrap;
+      margin-top : var(--spacing-md);
+      padding    : 0 var(--spacing-xs);
+    }
+
+    .legenda-prioridades__titulo {
+      font-size  : 0.75rem;
+      color      : var(--cor-muted);
+      font-weight: 500;
+    }
+
+    .legenda-prioridades__items {
+      display  : flex;
+      gap      : var(--spacing-md);
       flex-wrap: wrap;
     }
 
-    .formulario__input {
-      flex: 1;
-      min-width: 140px;
-      padding: var(--space-sm) var(--space-md);
-      border: 1px solid var(--cor-borda);
-      border-radius: var(--radius-sm);
-      background: white;
-      color: var(--cor-texto);
-      transition: border-color var(--transicao);
-    }
-
-    .formulario__input::placeholder { color: var(--cor-texto-3); }
-    .formulario__input:focus { outline: 2px solid var(--cor-foco); outline-offset: 1px; border-color: var(--cor-foco); }
-
-    .formulario__select {
-      padding: var(--space-sm) var(--space-md);
-      border: 1px solid var(--cor-borda);
-      border-radius: var(--radius-sm);
-      background: white;
-      color: var(--cor-texto);
-      cursor: pointer;
-      transition: border-color var(--transicao);
-    }
-
-    .formulario__select:focus { outline: 2px solid var(--cor-foco); outline-offset: 1px; border-color: var(--cor-foco); }
-
-    .formulario__botao {
-      padding: var(--space-sm) var(--space-md);
-      background: var(--cor-primaria);
-      color: white;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background var(--transicao), transform var(--transicao);
-    }
-
-    .formulario__botao:hover { background: var(--cor-primaria-hover); }
-    .formulario__botao:active { transform: scale(0.95); }
-
-    /* Seções e Listas */
-    .secao-categoria { margin-bottom: var(--space-xl); }
-    .secao-categoria:last-of-type { margin-bottom: 0; }
-
-    .secao-categoria__titulo {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--cor-texto-3);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: var(--space-md);
-      display: flex;
+    .legenda-item {
+      display    : inline-flex;
       align-items: center;
-      gap: var(--space-sm);
+      gap        : 6px;
+      font-size  : 0.75rem;
+      color      : var(--cor-muted);
     }
 
-    .secao-categoria__titulo::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--cor-borda);
+    .legenda-item__cor {
+      width        : 10px;
+      height       : 10px;
+      border-radius: 3px;
+      flex-shrink  : 0;
     }
 
-    .lista-tarefas {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-sm);
-    }
+    .legenda-item__cor--alta  { background: var(--prioridade-alta-borda); }
+    .legenda-item__cor--media { background: var(--prioridade-media-borda); }
+    .legenda-item__cor--baixa { background: var(--prioridade-baixa-borda); }
 
-    /* Checkbox Hack */
-    .item-tarefa input[type="checkbox"] { display: none; }
-
-    .item-tarefa label {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      border: 1px solid transparent;
-      cursor: pointer;
-      font-size: 0.95rem;
-      color: var(--cor-texto);
-      transition: background var(--transicao), border-color var(--transicao), color var(--transicao);
-      position: relative;
-    }
-
-    .item-tarefa label:hover {
-      background: rgba(0, 0, 0, 0.03);
-      border-color: var(--cor-borda);
-    }
-
-    .item-tarefa label::before {
-      content: '';
-      width: 20px;
-      height: 20px;
-      min-width: 20px;
-      border-radius: 50%;
-      border: 2px solid var(--cor-borda-hover);
-      background: white;
-      transition: background var(--transicao), border-color var(--transicao), transform 0.15s ease;
-    }
-
-    .item-tarefa input:checked + label {
-      color: var(--cor-concluido);
-      text-decoration: line-through;
-      text-decoration-color: var(--cor-concluido);
-      text-decoration-thickness: 1.5px;
-      opacity: 0.65;
-    }
-
-    .item-tarefa input:checked + label::before {
-      background: var(--cor-primaria);
-      border-color: var(--cor-primaria);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpolyline points='1.5%2C5 4.5%2C8 10.5%2C1.5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C%2Fsvg%3E");
-      background-size: 12px 10px;
-      background-repeat: no-repeat;
-      background-position: center;
-      transform: scale(1.15);
-    }
-
-    .item-tarefa input:checked + label:hover::before { transform: scale(1.05); }
-    .item-tarefa__texto { flex: 1; line-height: 1.4; }
-    .item-tarefa label:focus-visible { outline: 2px solid var(--cor-foco); outline-offset: 2px; }
-
-    /* Prioridades e Badges */
-    .prioridade-alta label { border-left: 3px solid var(--alta-base) !important; background: var(--alta-bg); }
-    .prioridade-alta label:hover { background: #ffe0e2; border-color: var(--cor-borda) !important; border-left-color: var(--alta-base) !important; }
-    .prioridade-alta input:checked + label { border-left-color: var(--cor-borda) !important; background: transparent; }
-
-    .prioridade-media label { border-left: 3px solid var(--media-base) !important; background: var(--media-bg); }
-    .prioridade-media label:hover { background: #fdecd0; border-color: var(--cor-borda) !important; border-left-color: var(--media-base) !important; }
-    .prioridade-media input:checked + label { border-left-color: var(--cor-borda) !important; background: transparent; }
-
-    .prioridade-baixa label { border-left: 3px solid var(--baixa-base) !important; background: var(--baixa-bg); }
-    .prioridade-baixa label:hover { background: #d8f2ef; border-color: var(--cor-borda) !important; border-left-color: var(--baixa-base) !important; }
-    .prioridade-baixa input:checked + label { border-left-color: var(--cor-borda) !important; background: transparent; }
-
-    .badge {
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 2px var(--space-sm);
-      border-radius: 20px;
+    /* ============================================================
+       SEÇÃO 18 — ACESSIBILIDADE: .sr-only
+       Conteúdo visível apenas para leitores de tela.
+       clip + overflow: hidden = invisível visualmente.
+       position: absolute + 1px = sem impacto no layout.
+       NÃO usar display:none — remove da árvore de acessibilidade.
+    ============================================================ */
+    .sr-only {
+      position   : absolute;
+      width      : 1px;
+      height     : 1px;
+      padding    : 0;
+      margin     : -1px;
+      overflow   : hidden;
+      clip       : rect(0, 0, 0, 0);
       white-space: nowrap;
-      margin-left: auto;
-      transition: opacity var(--transicao);
+      border     : 0;
     }
 
-    .prioridade-alta .badge { background: var(--alta-bg); color: var(--alta-text); border: 1px solid var(--alta-base); }
-    .prioridade-media .badge { background: var(--media-bg); color: var(--media-text); border: 1px solid var(--media-base); }
-    .prioridade-baixa .badge { background: var(--baixa-bg); color: var(--baixa-text); border: 1px solid var(--baixa-base); }
-    .item-tarefa input:checked + label .badge { display: none; }
+    /* ============================================================
+       SEÇÃO 19 — RESPONSIVIDADE (mobile-first)
+       Os estilos base já funcionam em mobile graças a:
+       unidades relativas, flexbox com flex-wrap, e clamp().
+       Media queries aqui apenas refinam casos extremos.
+    ============================================================ */
+    @media (max-width: 480px) {
+      .form-nova-tarefa {
+        flex-direction: column;
+      }
 
-    .rodape {
-      margin-top: var(--space-xl);
-      padding-top: var(--space-lg);
-      border-top: 2px dashed var(--cor-borda);
-      font-size: 0.72rem;
-      color: var(--cor-texto-3);
-      text-align: center;
-      letter-spacing: 0.04em;
+      .form-nova-tarefa__botao {
+        width          : 100%;
+        justify-content: center;
+      }
+
+      .task-item {
+        padding: var(--spacing-md);
+        gap    : var(--spacing-sm);
+      }
+
+      /* A borda lateral já comunica a prioridade em telas pequenas */
+      .task-item__badge {
+        display: none;
+      }
+
+      .lista-rodape__dica {
+        display: none;
+      }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
-    }
-
-    @media (max-width: 360px) {
-      .formulario { flex-direction: column; }
-      .formulario__botao { width: 100%; }
-      .item-tarefa label { font-size: 0.88rem; padding: var(--space-sm) var(--space-md); gap: var(--space-sm); }
-    }
   </style>
 </head>
-
 <body>
 
-  <main class="card-principal" role="main">
+  <input
+    type="radio"
+    id="filtro-todas"
+    name="filtro-lista"
+    class="filtro-radio"
+    checked
+    aria-hidden="true"
+  >
+  <input
+    type="radio"
+    id="filtro-ativas"
+    name="filtro-lista"
+    class="filtro-radio"
+    aria-hidden="true"
+  >
+  <input
+    type="radio"
+    id="filtro-concluidas"
+    name="filtro-lista"
+    class="filtro-radio"
+    aria-hidden="true"
+  >
 
-    <header class="cabecalho">
-      <h1>📋 Minhas Tarefas</h1>
-      <p>Projeto Acadêmico · Engenharia de Prompt · v1.1</p>
+  <main class="container" role="main">
+
+    <header class="app-cabecalho">
+      <p class="app-cabecalho__eyebrow" aria-hidden="true">
+        Projeto Acadêmico
+      </p>
+      <h1 class="app-cabecalho__titulo">Minhas Tarefas</h1>
+      <p class="app-cabecalho__subtitulo">
+        Clique em uma tarefa para marcá-la como concluída
+      </p>
     </header>
 
-    <section class="area-formulario" aria-label="Adicionar nova tarefa">
-      <div class="formulario" role="group">
-        
-        <input
-          id="input-tarefa"
-          class="formulario__input"
-          type="text"
-          placeholder="Nova tarefa..."
-          aria-label="Texto da nova tarefa"
-        />
+    <form
+      class="form-nova-tarefa"
+      aria-label="Adicionar nova tarefa"
+    >
+      <label for="input-nova-tarefa" class="sr-only">
+        Texto da nova tarefa
+      </label>
+      <input
+        type="text"
+        id="input-nova-tarefa"
+        class="form-nova-tarefa__input"
+        placeholder="Descreva sua tarefa..."
+        autocomplete="off"
+        maxlength="120"
+      >
 
-        <select id="select-categoria" class="formulario__select" aria-label="Categoria da nova tarefa">
-          <option value="faculdade">🎓 Faculdade</option>
-          <option value="pessoal">🌱 Pessoal</option>
-          <option value="projetos">💻 Projetos</option>
-        </select>
+      <label for="select-prioridade" class="sr-only">
+        Prioridade
+      </label>
+      <select
+        id="select-prioridade"
+        class="form-nova-tarefa__select"
+        aria-label="Prioridade da tarefa"
+      >
+        <option value="alta">Alta</option>
+        <option value="media" selected>Média</option>
+        <option value="baixa">Baixa</option>
+      </select>
 
-        <select id="select-prioridade" class="formulario__select" aria-label="Prioridade da nova tarefa">
-          <option value="alta">🔴 Alta</option>
-          <option value="media" selected>🟡 Média</option>
-          <option value="baixa">🟢 Baixa</option>
-        </select>
+      <button
+        type="submit"
+        class="form-nova-tarefa__botao"
+      >
+        + Adicionar
+      </button>
+    </form>
 
-        <button id="btn-adicionar" class="formulario__botao" aria-label="Adicionar nova tarefa">
-          +
-        </button>
+    <section
+      class="lista-cartao"
+      aria-label="Lista de tarefas"
+    >
 
+      <nav
+        class="lista-filtros"
+        aria-label="Filtrar tarefas por estado"
+      >
+        <label
+          for="filtro-todas"
+          class="filtro-label"
+        >Todas</label>
+        <label
+          for="filtro-ativas"
+          class="filtro-label"
+        >Ativas</label>
+        <label
+          for="filtro-concluidas"
+          class="filtro-label"
+        >Concluídas</label>
+      </nav>
+
+      <ul
+        id="lista-tarefas"
+        class="lista-tarefas"
+        role="list"
+        aria-label="Tarefas"
+      >
+
+        <li>
+          <input
+            type="checkbox"
+            id="task-1"
+            class="task-check"
+            aria-describedby="task-1-texto"
+          >
+          <label for="task-1" class="task-item prioridade-alta">
+            <span class="task-item__check" aria-hidden="true"></span>
+            <span class="task-item__conteudo">
+              <span id="task-1-texto" class="task-item__texto">
+                Revisar critérios WCAG 2.1 de acessibilidade
+              </span>
+              <span class="task-item__badge">Alta</span>
+            </span>
+          </label>
+        </li>
+
+        <li>
+          <input
+            type="checkbox"
+            id="task-2"
+            class="task-check"
+            checked
+            aria-describedby="task-2-texto"
+          >
+          <label for="task-2" class="task-item prioridade-media">
+            <span class="task-item__check" aria-hidden="true"></span>
+            <span class="task-item__conteudo">
+              <span id="task-2-texto" class="task-item__texto">
+                Configurar variáveis CSS no :root
+              </span>
+              <span class="task-item__badge">Média</span>
+            </span>
+          </label>
+        </li>
+
+        <li>
+          <input
+            type="checkbox"
+            id="task-3"
+            class="task-check"
+            aria-describedby="task-3-texto"
+          >
+          <label for="task-3" class="task-item prioridade-baixa">
+            <span class="task-item__check" aria-hidden="true"></span>
+            <span class="task-item__conteudo">
+              <span id="task-3-texto" class="task-item__texto">
+                Estudar os combinadores CSS: +, ~, > e espaço
+              </span>
+              <span class="task-item__badge">Baixa</span>
+            </span>
+          </label>
+        </li>
+
+        <li>
+          <input
+            type="checkbox"
+            id="task-4"
+            class="task-check"
+            aria-describedby="task-4-texto"
+          >
+          <label for="task-4" class="task-item prioridade-alta">
+            <span class="task-item__check" aria-hidden="true"></span>
+            <span class="task-item__conteudo">
+              <span id="task-4-texto" class="task-item__texto">
+                Implementar filtros com radio buttons ocultos
+              </span>
+              <span class="task-item__badge">Alta</span>
+            </span>
+          </label>
+        </li>
+
+        <li>
+          <input
+            type="checkbox"
+            id="task-5"
+            class="task-check"
+            aria-describedby="task-5-texto"
+          >
+          <label for="task-5" class="task-item prioridade-media">
+            <span class="task-item__check" aria-hidden="true"></span>
+            <span class="task-item__conteudo">
+              <span id="task-5-texto" class="task-item__texto">
+                Documentar decisões de arquitetura no HTML
+              </span>
+              <span class="task-item__badge">Média</span>
+            </span>
+          </label>
+        </li>
+
+        <li>
+          <input
+            type="checkbox"
+            id="task-6"
+            class="task-check"
+            checked
+            aria-describedby="task-6-texto"
+          >
+          <label for="task-6" class="task-item prioridade-baixa">
+            <span class="task-item__check" aria-hidden="true"></span>
+            <span class="task-item__conteudo">
+              <span id="task-6-texto" class="task-item__texto">
+                Organizar estrutura de arquivos e pastas
+              </span>
+              <span class="task-item__badge">Baixa</span>
+            </span>
+          </label>
+        </li>
+
+      </ul>
+
+      <footer class="lista-rodape">
+        <span class="lista-rodape__info"><strong>6</strong> tarefas no total</span>
+        <span class="lista-rodape__dica">Filtros via CSS e inserção/contagem via JS</span>
+      </footer>
+
+    </section>
+
+    <aside class="legenda-prioridades" aria-label="Legenda das cores de prioridade">
+      <span class="legenda-prioridades__titulo">PRIORIDADES:</span>
+      
+      <div class="legenda-prioridades__items">
+        <span class="legenda-item">
+          <span class="legenda-item__cor legenda-item__cor--alta" aria-hidden="true"></span>
+          Alta
+        </span>
+        <span class="legenda-item">
+          <span class="legenda-item__cor legenda-item__cor--media" aria-hidden="true"></span>
+          Média
+        </span>
+        <span class="legenda-item">
+          <span class="legenda-item__cor legenda-item__cor--baixa" aria-hidden="true"></span>
+          Baixa
+        </span>
       </div>
-    </section>
+    </aside>
 
-    <section class="secao-categoria" aria-labelledby="titulo-faculdade">
-      <h2 class="secao-categoria__titulo" id="titulo-faculdade">🎓 Faculdade</h2>
-      <ul id="lista-faculdade" class="lista-tarefas" role="list">
-        <li class="item-tarefa prioridade-alta" role="listitem">
-          <input type="checkbox" id="t1" aria-describedby="prioridade-t1" />
-          <label for="t1">
-            <span class="item-tarefa__texto">Entregar relatório de Eng. de Prompt</span>
-            <span class="badge" id="prioridade-t1" aria-label="Prioridade: Alta">Alta</span>
-          </label>
-        </li>
-        <li class="item-tarefa prioridade-media" role="listitem">
-          <input type="checkbox" id="t2" aria-describedby="prioridade-t2" />
-          <label for="t2">
-            <span class="item-tarefa__texto">Estudar seletores CSS avançados (:has, ~)</span>
-            <span class="badge" id="prioridade-t2" aria-label="Prioridade: Média">Média</span>
-          </label>
-        </li>
-        <li class="item-tarefa prioridade-baixa" role="listitem">
-          <input type="checkbox" id="t3" checked aria-describedby="prioridade-t3" />
-          <label for="t3">
-            <span class="item-tarefa__texto">Criar estrutura base do HTML semântico</span>
-            <span class="badge" id="prioridade-t3" aria-label="Prioridade: Baixa">Baixa</span>
-          </label>
-        </li>
-      </ul>
-    </section>
-
-    <section class="secao-categoria" aria-labelledby="titulo-pessoal">
-      <h2 class="secao-categoria__titulo" id="titulo-pessoal">🌱 Pessoal</h2>
-      <ul id="lista-pessoal" class="lista-tarefas" role="list">
-        <li class="item-tarefa prioridade-media" role="listitem">
-          <input type="checkbox" id="t5" checked aria-describedby="prioridade-t5" />
-          <label for="t5">
-            <span class="item-tarefa__texto">Tomar café da manhã</span>
-            <span class="badge" id="prioridade-t5" aria-label="Prioridade: Média">Média</span>
-          </label>
-        </li>
-        <li class="item-tarefa prioridade-baixa" role="listitem">
-          <input type="checkbox" id="t6" aria-describedby="prioridade-t6" />
-          <label for="t6">
-            <span class="item-tarefa__texto">Ler 30 minutos de livro técnico</span>
-            <span class="badge" id="prioridade-t6" aria-label="Prioridade: Baixa">Baixa</span>
-          </label>
-        </li>
-        <li class="item-tarefa prioridade-alta" role="listitem">
-          <input type="checkbox" id="t7" aria-describedby="prioridade-t7" />
-          <label for="t7">
-            <span class="item-tarefa__texto">Caminhar 20 minutos ao ar livre</span>
-            <span class="badge" id="prioridade-t7" aria-label="Prioridade: Alta">Alta</span>
-          </label>
-        </li>
-      </ul>
-    </section>
-
-    <section class="secao-categoria" aria-labelledby="titulo-projetos">
-      <h2 class="secao-categoria__titulo" id="titulo-projetos">💻 Projetos</h2>
-      <ul id="lista-projetos" class="lista-tarefas" role="list">
-        <li class="item-tarefa prioridade-media" role="listitem">
-          <input type="checkbox" id="t8" aria-describedby="prioridade-t8" />
-          <label for="t8">
-            <span class="item-tarefa__texto">Publicar projeto no GitHub Pages</span>
-            <span class="badge" id="prioridade-t8" aria-label="Prioridade: Média">Média</span>
-          </label>
-        </li>
-        <li class="item-tarefa prioridade-baixa" role="listitem">
-          <input type="checkbox" id="t9" aria-describedby="prioridade-t9" />
-          <label for="t9">
-            <span class="item-tarefa__texto">Documentar o Checkbox Hack no README</span>
-            <span class="badge" id="prioridade-t9" aria-label="Prioridade: Baixa">Baixa</span>
-          </label>
-        </li>
-      </ul>
-    </section>
-
-    <footer class="rodape">
-      <p>HTML5 + CSS3 + JavaScript · WCAG AA</p>
-    </footer>
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const inputTarefa = document.getElementById('input-tarefa');
-      const selectCategoria = document.getElementById('select-categoria');
-      const selectPrioridade = document.getElementById('select-prioridade');
-      const btnAdicionar = document.getElementById('btn-adicionar');
+    const form = document.querySelector(".form-nova-tarefa");
+    const input = document.getElementById("input-nova-tarefa");
+    const select = document.getElementById("select-prioridade");
+    const lista = document.getElementById("lista-tarefas");
+    const info = document.querySelector(".lista-rodape__info");
 
-      // Variável para gerar IDs únicos para os novos inputs (começa no 10, já que o HTML vai até t9)
-      let contadorTarefas = 10;
+    let total = document.querySelectorAll(".task-item").length;
+    let pendentes = document.querySelectorAll(".task-check:not(:checked)").length;
 
-      // Função principal de adicionar tarefa
-      function adicionarNovaTarefa() {
-        const textoTarefa = inputTarefa.value.trim();
-        
-        // Impede de adicionar tarefa vazia
-        if (textoTarefa === '') {
-          inputTarefa.focus();
-          return; 
-        }
+    function atualizarContador() {
+      info.innerHTML = `<strong>${pendentes}</strong>&nbsp;tarefas pendentes de ${total}`;
+    }
 
-        const categoriaSelecionada = selectCategoria.value;
-        const prioridadeSelecionada = selectPrioridade.value;
-        
-        // Define o texto do badge com base na prioridade
-        let textoBadge = 'Média';
-        if (prioridadeSelecionada === 'alta') textoBadge = 'Alta';
-        if (prioridadeSelecionada === 'baixa') textoBadge = 'Baixa';
-
-        // Pega a lista (ul) correta baseada na categoria
-        const listaAlvo = document.getElementById(`lista-${categoriaSelecionada}`);
-        
-        // Criação dinâmica dos elementos HTML
-        const novoItem = document.createElement('li');
-        novoItem.className = `item-tarefa prioridade-${prioridadeSelecionada}`;
-        novoItem.setAttribute('role', 'listitem');
-
-        const idUnico = `t${contadorTarefas}`;
-        contadorTarefas++;
-
-        // Injeta a mesma estrutura do CSS Checkbox Hack
-        novoItem.innerHTML = `
-          <input type="checkbox" id="${idUnico}" aria-describedby="prioridade-${idUnico}" />
-          <label for="${idUnico}">
-            <span class="item-tarefa__texto">${textoTarefa}</span>
-            <span class="badge" id="prioridade-${idUnico}" aria-label="Prioridade: ${textoBadge}">${textoBadge}</span>
-          </label>
-        `;
-
-        // Adiciona a tarefa ao final da lista escolhida
-        listaAlvo.appendChild(novoItem);
-
-        // Limpa o input e devolve o foco
-        inputTarefa.value = '';
-        inputTarefa.focus();
-      }
-
-      // Adiciona o evento de clique no botão
-      btnAdicionar.addEventListener('click', adicionarNovaTarefa);
-
-      // Permite adicionar a tarefa apertando "Enter" no teclado
-      inputTarefa.addEventListener('keypress', (evento) => {
-        if (evento.key === 'Enter') {
-          adicionarNovaTarefa();
-        }
+    // CHECKBOXES EXISTENTES
+    document.querySelectorAll(".task-check").forEach(cb => {
+      cb.addEventListener("change", () => {
+        if (cb.checked) pendentes--;
+        else pendentes++;
+        atualizarContador();
       });
     });
+
+    // ADICIONAR TAREFA
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const texto = input.value.trim();
+      const prioridade = select.value;
+
+      if (!texto) return;
+
+      total++;
+      pendentes++;
+
+      const id = "task-" + total;
+
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        <input
+          type="checkbox"
+          id="${id}"
+          class="task-check"
+        >
+        <label for="${id}" class="task-item prioridade-${prioridade}">
+          <span class="task-item__check"></span>
+          <span class="task-item__conteudo">
+            <span class="task-item__texto">${texto}</span>
+            <span class="task-item__badge">
+              ${prioridade.charAt(0).toUpperCase() + prioridade.slice(1)}
+            </span>
+          </span>
+        </label>
+      `;
+
+      lista.appendChild(li);
+
+      const checkbox = li.querySelector(".task-check");
+
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) pendentes--;
+        else pendentes++;
+        atualizarContador();
+      });
+
+      input.value = "";
+      atualizarContador();
+    });
+
+    atualizarContador();
   </script>
 
 </body>
