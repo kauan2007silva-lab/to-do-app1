@@ -6,269 +6,216 @@
   <title>To-Do List — Projeto Acadêmico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* ============================================================
-       BASE & VARIÁVEIS (Mantidos do anterior)
-    ============================================================ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    ul, ol { list-style: none; }
-
+    /* RESET E VARIÁVEIS */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --fonte-display: 'Syne', sans-serif;
       --fonte-corpo: 'DM Sans', sans-serif;
       --cor-fundo: #F4EFE6;
       --cor-superficie: #FDFAF5;
-      --cor-primaria: #18182A;
       --cor-texto: #383848;
       --cor-muted: #888898;
-      --cor-borda: #DDD8CE;
       --cor-acento: #D9725A;
       --cor-acento-hover: #BF5C45;
-      --cor-acento-fundo: rgba(217, 114, 90, 0.09);
-      --cor-erro: #e74c3c;
+      --cor-borda: #DDD8CE;
       
-      --prioridade-alta-fundo : #FEF0EE; --prioridade-alta-borda : #E07060; --prioridade-alta-texto : #9C2B1E; --prioridade-alta-badge : #FCDBD6;
-      --prioridade-media-fundo : #FEF6EA; --prioridade-media-borda : #D99A38; --prioridade-media-texto : #7A4E10; --prioridade-media-badge : #FDECC8;
-      --prioridade-baixa-fundo : #EEF7EE; --prioridade-baixa-borda : #52A060; --prioridade-baixa-texto : #1E5E2A; --prioridade-baixa-badge : #CDEBD0;
-
-      --spacing-md: 16px; --spacing-lg: 24px;
-      --raio-md: 10px; --raio-xl: 24px; --raio-pill: 999px;
-      --transition-base: 200ms ease-out;
+      --prioridade-alta: #E07060;
+      --prioridade-media: #D99A38;
+      --prioridade-baixa: #52A060;
     }
 
     body {
       font-family: var(--fonte-corpo);
       background: var(--cor-fundo);
       color: var(--cor-texto);
-      padding: 48px var(--spacing-md);
-      min-height: 100vh;
+      padding: 40px 20px;
+      line-height: 1.6;
     }
 
     .container { max-width: 600px; margin: 0 auto; }
 
-    /* ============================================================
-       FILTROS CSS (HACK DO RADIO)
-    ============================================================ */
-    .filtro-radio { position: absolute; opacity: 0; pointer-events: none; }
+    header h1 { font-family: var(--fonte-display); font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
 
-    .lista-filtros {
-      display: flex; gap: 2px; padding: 8px;
-      border-bottom: 1px solid var(--cor-borda);
-      background: rgba(0, 0, 0, 0.02);
+    /* FORMULÁRIO */
+    .form-nova-tarefa { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+    .form-nova-tarefa input, .form-nova-tarefa select {
+      padding: 12px; border: 1.5px solid var(--cor-borda); border-radius: 8px; outline: none;
     }
-
-    .filtro-label {
-      flex: 1; padding: 8px; text-align: center; font-size: 0.875rem;
-      cursor: pointer; border-radius: 6px; color: var(--cor-muted);
-      transition: all var(--transition-base);
+    .form-nova-tarefa input { flex: 1; min-width: 200px; }
+    .form-nova-tarefa button {
+      padding: 12px 20px; background: var(--cor-acento); color: white; border: none; 
+      border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
     }
+    .form-nova-tarefa button:hover { background: var(--cor-acento-hover); }
 
-    /* Estilo quando o filtro está ativo */
-    #filtro-todas:checked ~ .lista-cartao label[for="filtro-todas"],
-    #filtro-ativas:checked ~ .lista-cartao label[for="filtro-ativas"],
-    #filtro-concluidas:checked ~ .lista-cartao label[for="filtro-concluidas"] {
-      background: white; color: var(--cor-primaria); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    /* Lógica de exibição das tarefas baseada no rádio marcado */
-    #filtro-ativas:checked ~ .lista-cartao .task-check:checked + .task-container { display: none; }
-    #filtro-concluidas:checked ~ .lista-cartao .task-check:not(:checked) + .task-container { display: none; }
-
-    /* ============================================================
-       FORMULÁRIO & CARTÃO
-    ============================================================ */
-    .app-cabecalho { margin-bottom: 32px; }
-    .form-nova-tarefa { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    /* CARTÃO E FILTROS */
+    .lista-cartao { background: var(--cor-superficie); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     
-    .form-nova-tarefa__input, .form-nova-tarefa__select {
-      height: 44px; padding: 0 12px; border: 1.5px solid var(--cor-borda);
-      border-radius: var(--raio-md); background: white; outline: none;
+    .lista-filtros { display: flex; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--cor-borda); }
+    .btn-filtro {
+      flex: 1; padding: 15px; border: none; background: none; cursor: pointer;
+      color: var(--cor-muted); font-weight: 500; transition: 0.3s;
     }
-    .form-nova-tarefa__input { flex: 1; min-width: 200px; }
-    .form-nova-tarefa__botao {
-      height: 44px; padding: 0 20px; background: var(--cor-acento);
-      color: white; border: none; border-radius: var(--raio-md); cursor: pointer;
-      font-weight: 500; transition: 200ms;
-    }
-    .form-nova-tarefa__botao:hover { background: var(--cor-acento-hover); }
+    .btn-filtro.ativo { color: var(--cor-acento); background: white; border-bottom: 2px solid var(--cor-acento); }
 
-    .lista-cartao {
-      background: var(--cor-superficie); border-radius: var(--raio-xl);
-      overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    /* ============================================================
-       ITENS DA LISTA
-    ============================================================ */
-    .task-container {
-      display: flex; align-items: center; border-bottom: 1px solid var(--cor-borda);
-      transition: background 0.2s;
-    }
-    .task-container:hover { background: rgba(0,0,0,0.01); }
-
-    .task-check { position: absolute; opacity: 0; }
-
+    /* ITENS DA LISTA */
+    #lista-tarefas { list-style: none; }
     .task-item {
-      flex: 1; display: flex; align-items: center; gap: 12px;
-      padding: 16px; cursor: pointer; border-left: 4px solid transparent;
+      display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--cor-borda);
+      animation: fadeIn 0.3s ease;
     }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Botão de excluir */
-    .btn-excluir {
-      background: none; border: none; color: var(--cor-muted);
-      padding: 16px; cursor: pointer; font-size: 1.2rem;
-      transition: color 0.2s; opacity: 0.3;
-    }
-    .task-container:hover .btn-excluir { opacity: 1; }
-    .btn-excluir:hover { color: var(--cor-erro); }
+    .task-check { width: 20px; height: 20px; cursor: pointer; accent-color: var(--cor-acento); margin-right: 15px; }
+    
+    .task-conteudo { flex: 1; display: flex; flex-direction: column; }
+    .task-texto { font-size: 1rem; }
+    .concluida .task-texto { text-decoration: line-through; color: var(--cor-muted); }
 
-    /* Checkbox visual */
-    .task-item__check {
-      width: 20px; height: 20px; border: 2px solid var(--cor-borda);
-      border-radius: 50%; position: relative; flex-shrink: 0;
-    }
-    .task-check:checked + .task-container .task-item__check {
-      background: var(--cor-acento); border-color: var(--cor-acento);
-    }
-    .task-check:checked + .task-container .task-item__check::after {
-      content: '✓'; color: white; position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); font-size: 12px;
-    }
+    .badge { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-top: 4px; }
+    .badge-alta { color: var(--prioridade-alta); }
+    .badge-media { color: var(--prioridade-media); }
+    .badge-baixa { color: var(--prioridade-baixa); }
 
-    /* Texto e Prioridades */
-    .task-item__texto { flex: 1; font-size: 0.95rem; }
-    .task-check:checked + .task-container .task-item__texto {
-      text-decoration: line-through; color: var(--cor-muted);
+    .btn-deletar {
+      background: none; border: none; color: #ff5e5e; cursor: pointer; 
+      font-size: 1.2rem; margin-left: 15px; opacity: 0.5; transition: 0.3s;
     }
+    .btn-deletar:hover { opacity: 1; transform: scale(1.2); }
 
-    .task-item.prioridade-alta { border-left-color: var(--prioridade-alta-borda); background: var(--prioridade-alta-fundo); }
-    .task-item.prioridade-media { border-left-color: var(--prioridade-media-borda); background: var(--prioridade-media-fundo); }
-    .task-item.prioridade-baixa { border-left-color: var(--prioridade-baixa-borda); background: var(--prioridade-baixa-fundo); }
+    .rodape { padding: 15px 20px; font-size: 0.8rem; color: var(--cor-muted); text-align: center; }
 
-    .task-item__badge {
-      font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase;
-    }
-    .prioridade-alta .task-item__badge { background: var(--prioridade-alta-badge); color: var(--prioridade-alta-texto); }
-    .prioridade-media .task-item__badge { background: var(--prioridade-media-badge); color: var(--prioridade-media-texto); }
-    .prioridade-baixa .task-item__badge { background: var(--prioridade-baixa-badge); color: var(--prioridade-baixa-texto); }
-
-    .lista-rodape { padding: 16px; font-size: 0.85rem; color: var(--cor-muted); border-top: 1px solid var(--cor-borda); }
+    /* ESTADO VAZIO */
+    .vazio { padding: 40px; text-align: center; color: var(--cor-muted); font-style: italic; }
   </style>
 </head>
 <body>
 
-  <input type="radio" id="filtro-todas" name="filtro-lista" class="filtro-radio" checked>
-  <input type="radio" id="filtro-ativas" name="filtro-lista" class="filtro-radio">
-  <input type="radio" id="filtro-concluidas" name="filtro-lista" class="filtro-radio">
-
   <main class="container">
-    <header class="app-cabecalho">
-      <h1 style="font-family: var(--fonte-display);">Minhas Tarefas</h1>
-      <p style="color: var(--cor-muted);">Gerencie sua rotina acadêmica</p>
+    <header>
+      <h1>Minhas Tarefas</h1>
     </header>
 
-    <form class="form-nova-tarefa">
-      <input type="text" id="input-nova-tarefa" class="form-nova-tarefa__input" placeholder="O que precisa ser feito?" required>
-      <select id="select-prioridade" class="form-nova-tarefa__select">
+    <form class="form-nova-tarefa" id="todo-form">
+      <input type="text" id="task-input" placeholder="O que precisa ser feito?" required>
+      <select id="task-priority">
         <option value="alta">Alta</option>
         <option value="media" selected>Média</option>
         <option value="baixa">Baixa</option>
       </select>
-      <button type="submit" class="form-nova-tarefa__botao">Adicionar</button>
+      <button type="submit">Adicionar</button>
     </form>
 
-    <section class="lista-cartao">
+    <div class="lista-cartao">
       <nav class="lista-filtros">
-        <label for="filtro-todas" class="filtro-label">Todas</label>
-        <label for="filtro-ativas" class="filtro-label">Ativas</label>
-        <label for="filtro-concluidas" class="filtro-label">Concluídas</label>
+        <button class="btn-filtro ativo" data-filter="todas">Todas</button>
+        <button class="btn-filtro" data-filter="ativas">Ativas</button>
+        <button class="btn-filtro" data-filter="concluidas">Concluídas</button>
       </nav>
 
       <ul id="lista-tarefas">
         </ul>
 
-      <footer class="lista-rodape">
-        <span class="info-contador">Carregando tarefas...</span>
-      </footer>
-    </section>
+      <div class="rodape" id="contador">0 tarefas pendentes</div>
+    </div>
   </main>
 
   <script>
-    const form = document.querySelector(".form-nova-tarefa");
-    const input = document.getElementById("input-nova-tarefa");
-    const select = document.getElementById("select-prioridade");
-    const lista = document.getElementById("lista-tarefas");
-    const info = document.querySelector(".info-contador");
+    let tarefas = JSON.parse(localStorage.getItem('minhasTarefas')) || [];
+    let filtroAtual = 'todas';
 
-    let tarefasArray = [
-      { id: Date.now() + 1, texto: "Estudar para a prova de Cálculo", prioridade: "alta", concluida: false },
-      { id: Date.now() + 2, texto: "Configurar ambiente de desenvolvimento", prioridade: "media", concluida: true }
-    ];
+    const form = document.getElementById('todo-form');
+    const input = document.getElementById('task-input');
+    const priority = document.getElementById('task-priority');
+    const listaUl = document.getElementById('lista-tarefas');
+    const contador = document.getElementById('contador');
+    const botoesFiltro = document.querySelectorAll('.btn-filtro');
 
-    function atualizarInterface() {
-      lista.innerHTML = "";
-      
-      tarefasArray.forEach(tarefa => {
-        const itemLi = document.createElement("li");
-        itemLi.style.position = "relative";
-        
-        // Estrutura precisa seguir exatamente o CSS para o filtro funcionar
-        itemLi.innerHTML = `
-          <input type="checkbox" id="task-${tarefa.id}" class="task-check" ${tarefa.concluida ? 'checked' : ''}>
-          <div class="task-container">
-            <label for="task-${tarefa.id}" class="task-item prioridade-${tarefa.prioridade}">
-              <span class="task-item__check"></span>
-              <span class="task-item__texto">${tarefa.texto}</span>
-              <span class="task-item__badge">${tarefa.prioridade}</span>
-            </label>
-            <button class="btn-excluir" onclick="removerTarefa(${tarefa.id})" title="Excluir tarefa">×</button>
-          </div>
-        `;
-
-        // Evento de completar
-        const check = itemLi.querySelector(".task-check");
-        check.addEventListener("change", () => {
-          tarefa.concluida = check.checked;
-          atualizarContadores();
-        });
-
-        lista.appendChild(itemLi);
-      });
-
-      atualizarContadores();
-    }
-
-    function adicionarTarefa(e) {
+    // ADICIONAR TAREFA
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
       const novaTarefa = {
         id: Date.now(),
         texto: input.value,
-        prioridade: select.value,
+        prioridade: priority.value,
         concluida: false
       };
+      tarefas.push(novaTarefa);
+      salvarERenderizar();
+      input.value = '';
+    });
+
+    // RENDERIZAR LISTA
+    function renderizar() {
+      listaUl.innerHTML = '';
       
-      tarefasArray.push(novaTarefa);
-      input.value = "";
-      atualizarInterface();
+      // Filtragem
+      const tarefasFiltradas = tarefas.filter(t => {
+        if (filtroAtual === 'ativas') return !t.concluida;
+        if (filtroAtual === 'concluidas') return t.concluida;
+        return true;
+      });
+
+      if (tarefasFiltradas.length === 0) {
+        listaUl.innerHTML = `<div class="vazio">Nenhuma tarefa aqui...</div>`;
+      }
+
+      tarefasFiltradas.forEach(tarefa => {
+        const li = document.createElement('li');
+        li.className = `task-item ${tarefa.concluida ? 'concluida' : ''}`;
+        
+        li.innerHTML = `
+          <input type="checkbox" class="task-check" ${tarefa.concluida ? 'checked' : ''} onchange="toggleConcluir(${tarefa.id})">
+          <div class="task-conteudo">
+            <span class="task-texto">${tarefa.texto}</span>
+            <span class="badge badge-${tarefa.prioridade}">${tarefa.prioridade}</span>
+          </div>
+          <button class="btn-deletar" onclick="deletarTarefa(${tarefa.id})">🗑️</button>
+        `;
+        listaUl.appendChild(li);
+      });
+
+      atualizarContador();
     }
 
-    function removerTarefa(id) {
-      // Filtra o array removendo o ID clicado
-      tarefasArray = tarefasArray.filter(t => t.id !== id);
-      atualizarInterface();
+    // ALTERAR STATUS
+    window.toggleConcluir = (id) => {
+      tarefas = tarefas.map(t => t.id === id ? {...t, concluida: !t.concluidda} : t);
+      // Pequeno atraso para a animação visual antes de sumir se estiver no filtro
+      setTimeout(salvarERenderizar, 150);
+    };
+
+    // DELETAR
+    window.deletarTarefa = (id) => {
+      tarefas = tarefas.filter(t => t.id !== id);
+      salvarERenderizar();
+    };
+
+    // CONTADOR
+    function atualizarContador() {
+      const pendentes = tarefas.filter(t => !t.concluida).length;
+      contador.innerText = `${pendentes} tarefas pendentes de ${tarefas.length} no total`;
     }
 
-    function atualizarContadores() {
-      const total = tarefasArray.length;
-      const pendentes = tarefasArray.filter(t => !t.concluida).length;
-      info.innerHTML = `<strong>${pendentes}</strong> tarefas pendentes de ${total}`;
+    // LÓGICA DE FILTROS (CLIQUES)
+    botoesFiltro.forEach(botao => {
+      botao.addEventListener('click', () => {
+        botoesFiltro.forEach(b => b.classList.remove('ativo'));
+        botao.classList.add('ativo');
+        filtroAtual = botao.getAttribute('data-filter');
+        renderizar();
+      });
+    });
+
+    function salvarERenderizar() {
+      localStorage.setItem('minhasTarefas', JSON.stringify(tarefas));
+      renderizar();
     }
 
-    form.addEventListener("submit", adicionarTarefa);
-    
-    // Inicia a lista
-    atualizarInterface();
+    // INICIAR
+    renderizar();
   </script>
 </body>
 </html>
