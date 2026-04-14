@@ -20,6 +20,7 @@
       --cor-acento: #D9725A;
       --cor-acento-hover: #BF5C45;
       --cor-borda: #DDD8CE;
+      --cor-erro: #e74c3c;
       
       --prioridade-alta: #E07060;
       --prioridade-media: #D99A38;
@@ -31,7 +32,6 @@
       background: var(--cor-fundo);
       color: var(--cor-texto);
       padding: 40px 20px;
-      line-height: 1.6;
     }
 
     .container { max-width: 600px; margin: 0 auto; }
@@ -48,7 +48,6 @@
       padding: 12px 20px; background: var(--cor-acento); color: white; border: none; 
       border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
     }
-    .form-nova-tarefa button:hover { background: var(--cor-acento-hover); }
 
     /* CARTÃO E FILTROS */
     .lista-cartao { background: var(--cor-superficie); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -64,42 +63,36 @@
     #lista-tarefas { list-style: none; }
     .task-item {
       display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--cor-borda);
-      animation: fadeIn 0.3s ease;
+      animation: fadeIn 0.2s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .task-check { width: 20px; height: 20px; cursor: pointer; accent-color: var(--cor-acento); margin-right: 15px; }
     
-    .task-conteudo { flex: 1; display: flex; flex-direction: column; }
-    .task-texto { font-size: 1rem; }
+    .task-conteudo { flex: 1; }
     .concluida .task-texto { text-decoration: line-through; color: var(--cor-muted); }
 
-    .badge { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-top: 4px; }
+    .badge { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-left: 10px; }
     .badge-alta { color: var(--prioridade-alta); }
     .badge-media { color: var(--prioridade-media); }
     .badge-baixa { color: var(--prioridade-baixa); }
 
     .btn-deletar {
-      background: none; border: none; color: #ff5e5e; cursor: pointer; 
-      font-size: 1.2rem; margin-left: 15px; opacity: 0.5; transition: 0.3s;
+      background: none; border: none; color: var(--cor-muted); cursor: pointer; 
+      font-size: 1.1rem; margin-left: 15px; transition: 0.2s;
     }
-    .btn-deletar:hover { opacity: 1; transform: scale(1.2); }
+    .btn-deletar:hover { color: var(--cor-erro); }
 
     .rodape { padding: 15px 20px; font-size: 0.8rem; color: var(--cor-muted); text-align: center; }
-
-    /* ESTADO VAZIO */
-    .vazio { padding: 40px; text-align: center; color: var(--cor-muted); font-style: italic; }
   </style>
 </head>
 <body>
 
   <main class="container">
-    <header>
-      <h1>Minhas Tarefas</h1>
-    </header>
+    <header><h1>Minhas Tarefas</h1></header>
 
     <form class="form-nova-tarefa" id="todo-form">
-      <input type="text" id="task-input" placeholder="O que precisa ser feito?" required>
+      <input type="text" id="task-input" placeholder="Nova tarefa..." required>
       <select id="task-priority">
         <option value="alta">Alta</option>
         <option value="media" selected>Média</option>
@@ -115,14 +108,14 @@
         <button class="btn-filtro" data-filter="concluidas">Concluídas</button>
       </nav>
 
-      <ul id="lista-tarefas">
-        </ul>
+      <ul id="lista-tarefas"></ul>
 
       <div class="rodape" id="contador">0 tarefas pendentes</div>
     </div>
   </main>
 
   <script>
+    // 1. ESTADO DA APLICAÇÃO
     let tarefas = JSON.parse(localStorage.getItem('minhasTarefas')) || [];
     let filtroAtual = 'todas';
 
@@ -133,7 +126,7 @@
     const contador = document.getElementById('contador');
     const botoesFiltro = document.querySelectorAll('.btn-filtro');
 
-    // ADICIONAR TAREFA
+    // 2. FUNÇÃO PARA ADICIONAR
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const novaTarefa = {
@@ -147,32 +140,29 @@
       input.value = '';
     });
 
-    // RENDERIZAR LISTA
+    // 3. FUNÇÃO PARA RENDERIZAR (O coração da lógica de abas)
     function renderizar() {
       listaUl.innerHTML = '';
       
-      // Filtragem
+      // Filtra as tarefas baseado no botão clicado
       const tarefasFiltradas = tarefas.filter(t => {
         if (filtroAtual === 'ativas') return !t.concluida;
         if (filtroAtual === 'concluidas') return t.concluida;
         return true;
       });
 
-      if (tarefasFiltradas.length === 0) {
-        listaUl.innerHTML = `<div class="vazio">Nenhuma tarefa aqui...</div>`;
-      }
-
       tarefasFiltradas.forEach(tarefa => {
         const li = document.createElement('li');
         li.className = `task-item ${tarefa.concluida ? 'concluida' : ''}`;
         
         li.innerHTML = `
-          <input type="checkbox" class="task-check" ${tarefa.concluida ? 'checked' : ''} onchange="toggleConcluir(${tarefa.id})">
+          <input type="checkbox" class="task-check" ${tarefa.concluida ? 'checked' : ''} 
+            onclick="toggleTarefa(${tarefa.id})">
           <div class="task-conteudo">
             <span class="task-texto">${tarefa.texto}</span>
             <span class="badge badge-${tarefa.prioridade}">${tarefa.prioridade}</span>
           </div>
-          <button class="btn-deletar" onclick="deletarTarefa(${tarefa.id})">🗑️</button>
+          <button class="btn-deletar" onclick="removerTarefa(${tarefa.id})">🗑️</button>
         `;
         listaUl.appendChild(li);
       });
@@ -180,26 +170,18 @@
       atualizarContador();
     }
 
-    // ALTERAR STATUS
-    window.toggleConcluir = (id) => {
-      tarefas = tarefas.map(t => t.id === id ? {...t, concluida: !t.concluidda} : t);
-      // Pequeno atraso para a animação visual antes de sumir se estiver no filtro
-      setTimeout(salvarERenderizar, 150);
+    // 4. FUNÇÕES DE AÇÃO
+    window.toggleTarefa = (id) => {
+      tarefas = tarefas.map(t => t.id === id ? {...t, concluida: !t.concluida} : t);
+      salvarERenderizar();
     };
 
-    // DELETAR
-    window.deletarTarefa = (id) => {
+    window.removerTarefa = (id) => {
       tarefas = tarefas.filter(t => t.id !== id);
       salvarERenderizar();
     };
 
-    // CONTADOR
-    function atualizarContador() {
-      const pendentes = tarefas.filter(t => !t.concluida).length;
-      contador.innerText = `${pendentes} tarefas pendentes de ${tarefas.length} no total`;
-    }
-
-    // LÓGICA DE FILTROS (CLIQUES)
+    // 5. LÓGICA DE FILTROS (Alternar abas)
     botoesFiltro.forEach(botao => {
       botao.addEventListener('click', () => {
         botoesFiltro.forEach(b => b.classList.remove('ativo'));
@@ -209,13 +191,17 @@
       });
     });
 
+    function atualizarContador() {
+      const pendentes = tarefas.filter(t => !t.concluida).length;
+      contador.innerText = `${pendentes} tarefas pendentes de ${tarefas.length} no total`;
+    }
+
     function salvarERenderizar() {
       localStorage.setItem('minhasTarefas', JSON.stringify(tarefas));
       renderizar();
     }
 
-    // INICIAR
-    renderizar();
+    renderizar(); // Inicia a lista ao carregar
   </script>
 </body>
 </html>
